@@ -221,9 +221,9 @@ func (m *Manager) generateWorktreeDetails(name string) (WorktreeDetails, error) 
 
 // createWorktree creates a new git worktree
 func (m *Manager) createWorktree(details WorktreeDetails) error {
-	// Create parent directory
+	// Create parent directory with secure permissions
 	parentDir := filepath.Dir(details.Path)
-	if err := os.MkdirAll(parentDir, 0755); err != nil {
+	if err := os.MkdirAll(parentDir, 0750); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
@@ -251,6 +251,7 @@ func (m *Manager) launchClaude(worktreePath string) error {
 	}()
 
 	// Launch Claude Code
+	// #nosec G204 -- ClaudeCommand comes from user config, not untrusted input
 	cmd := exec.Command(m.config.ClaudeCommand)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

@@ -82,6 +82,16 @@ sudo mv claude-mux /usr/local/bin/
 - **Git** - Required for worktree management
 - **Claude Code** - Install from [Anthropic](https://docs.anthropic.com/en/docs/claude-code)
 
+## Setup
+
+Add the claude-mux directory to your project's `.gitignore`:
+
+```bash
+echo ".claude-mux/" >> .gitignore
+```
+
+This prevents worktree directories from being tracked in your repository.
+
 ## Usage
 
 ### Basic Commands
