@@ -10,6 +10,16 @@ import (
 	"github.com/enriikke/claude-mux/internal/config"
 )
 
+// restoreDirectory returns a function that restores the working directory
+// and reports any error via t.Errorf
+func restoreDirectory(t *testing.T, dir string) func() {
+	return func() {
+		if err := os.Chdir(dir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}
+}
+
 func setupTestRepo(t *testing.T) string {
 	tmpDir := t.TempDir()
 	originalDir, err := os.Getwd()
@@ -67,9 +77,14 @@ func TestManager_generateWorktreeDetails(t *testing.T) {
 
 	// Setup test repo
 	repoDir := setupTestRepo(t)
-	originalDir, _ := os.Getwd()
-	defer os.Chdir(originalDir)
-	os.Chdir(repoDir)
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer restoreDirectory(t, originalDir)()
+	if err := os.Chdir(repoDir); err != nil {
+		t.Fatalf("Failed to change to repo directory: %v", err)
+	}
 
 	tests := []struct {
 		name     string
@@ -117,19 +132,26 @@ func TestManager_List(t *testing.T) {
 
 	// Setup test repo
 	repoDir := setupTestRepo(t)
-	originalDir, _ := os.Getwd()
-	defer os.Chdir(originalDir)
-	os.Chdir(repoDir)
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer restoreDirectory(t, originalDir)()
+	if err := os.Chdir(repoDir); err != nil {
+		t.Fatalf("Failed to change to repo directory: %v", err)
+	}
 
 	// Test listing with no worktrees (should not error)
-	err := manager.List()
+	err = manager.List()
 	if err != nil {
 		t.Errorf("List() with no worktrees should not error: %v", err)
 	}
 
 	// Create a worktree manually
 	worktreePath := filepath.Join(repoDir, ".claude-mux-test", "test-worktree")
-	exec.Command("git", "worktree", "add", "-b", "claude-mux-test", worktreePath).Run()
+	if err := exec.Command("git", "worktree", "add", "-b", "claude-mux-test", worktreePath).Run(); err != nil {
+		t.Fatalf("Failed to create worktree: %v", err)
+	}
 
 	// Test listing with a worktree
 	err = manager.List()
