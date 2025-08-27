@@ -7,6 +7,16 @@ import (
 	"testing"
 )
 
+// restoreDirectory returns a function that restores the working directory
+// and reports any error via t.Errorf
+func restoreDirectory(t *testing.T, dir string) func() {
+	return func() {
+		if err := os.Chdir(dir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}
+}
+
 func TestClient_ValidateRepo(t *testing.T) {
 	client := NewClient(false)
 
@@ -16,11 +26,7 @@ func TestClient_ValidateRepo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get current directory: %v", err)
 	}
-	defer func() {
-		if err := os.Chdir(originalDir); err != nil {
-			t.Errorf("Failed to restore directory: %v", err)
-		}
-	}()
+	defer restoreDirectory(t, originalDir)()
 
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change to temp directory: %v", err)
@@ -57,11 +63,7 @@ func TestClient_CurrentBranch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get current directory: %v", err)
 	}
-	defer func() {
-		if err := os.Chdir(originalDir); err != nil {
-			t.Errorf("Failed to restore directory: %v", err)
-		}
-	}()
+	defer restoreDirectory(t, originalDir)()
 
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change to temp directory: %v", err)
@@ -127,11 +129,7 @@ func TestClient_CreateWorktree(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get current directory: %v", err)
 	}
-	defer func() {
-		if err := os.Chdir(originalDir); err != nil {
-			t.Errorf("Failed to restore directory: %v", err)
-		}
-	}()
+	defer restoreDirectory(t, originalDir)()
 
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change to temp directory: %v", err)
@@ -200,11 +198,7 @@ func TestClient_RemoveWorktree(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get current directory: %v", err)
 	}
-	defer func() {
-		if err := os.Chdir(originalDir); err != nil {
-			t.Errorf("Failed to restore directory: %v", err)
-		}
-	}()
+	defer restoreDirectory(t, originalDir)()
 
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change to temp directory: %v", err)

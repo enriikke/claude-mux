@@ -14,7 +14,6 @@ claude-mux
 coverage.*
 *.coverprofile
 profile.cov
-gosec-results.*
 
 # Dependency directories
 vendor/

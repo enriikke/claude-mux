@@ -26,7 +26,7 @@ Be kind, respectful, and considerate to others. We're all here to make claude-mu
 1. **Fork the repository** and create your branch from `main`
 2. **Set up your development environment**:
    ```bash
-   git clone https://github.com/yourusername/claude-mux.git
+   git clone https://github.com/enriikke/claude-mux.git
    cd claude-mux
    make dev-deps  # Install development dependencies
    ```
