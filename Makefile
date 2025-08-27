@@ -11,6 +11,7 @@ GOIMPORTS_VERSION := v0.36.0
 GOLANGCI_VERSION := v2.4.0
 GOTESTSUM_VERSION := v1.12.3
 GOSEC_VERSION := v2.22.8
+GORELEASER_VERSION=v2.11.2
 
 # Install development dependencies
 dev-deps:
@@ -19,6 +20,7 @@ dev-deps:
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 	go install gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
 	go install github.com/securego/gosec/v2/cmd/gosec@$(GOSEC_VERSION)
+	go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION}
 	@echo "Development dependencies installed!"
 
 # Build the binary
@@ -80,11 +82,21 @@ check: fmt vet lint security test
 
 # Test release with goreleaser
 release-dry:
-	goreleaser release --snapshot --clean
+	@if command -v goreleaser > /dev/null; then \
+		goreleaser release --snapshot --clean; \
+	else \
+		echo "goreleaser not installed. Run 'make dev-deps' first"; \
+		exit 1; \
+	fi
 
 # Create a new release (requires tag)
 release:
-	goreleaser release --clean
+	@if command -v goreleaser > /dev/null; then \
+		goreleaser release --clean; \
+	else \
+		echo "goreleaser not installed. Run 'make dev-deps' first"; \
+		exit 1; \
+	fi
 
 # Run the binary
 run: build

@@ -2,6 +2,8 @@
 
 version: 2
 
+project_name: claude-mux
+
 before:
   hooks:
     - go mod tidy
@@ -43,9 +45,10 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    formats: [ 'tar.gz' ]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
     files:
       - README.md
       - LICENSE
